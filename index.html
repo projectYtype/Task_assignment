@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>업무 관리 대시보드</title>
+  <title>모던 업무 관리 대시보드</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap 5 JS Bundle (Dropdown & Modal) -->
@@ -64,7 +64,7 @@
       margin: 0;
     }
 
-    /* Table & Card UI - 컴팩트하게 축소 */
+    /* Table & Card UI */
     .table-container {
       background: var(--card-bg);
       border-radius: 12px;
@@ -77,7 +77,7 @@
       width: 100%;
       min-width: 1100px;
       border-collapse: separate;
-      border-spacing: 0 4px; /* 행 사이 간격 대폭 축소 */
+      border-spacing: 0 4px;
     }
 
     .custom-table th {
@@ -102,7 +102,7 @@
     }
 
     .custom-table td {
-      padding: 6px 10px; /* 내부 패딩 대폭 축소 */
+      padding: 6px 10px;
       vertical-align: middle;
       border-top: 1px solid var(--border-color);
       border-bottom: 1px solid var(--border-color);
@@ -118,26 +118,26 @@
       border-radius: 6px;
       font-size: 0.85rem;
       padding: 4px 8px;
-      height: 30px; /* 높이 고정 축소 */
+      height: 30px;
       color: var(--text-main);
     }
 
-    /* Select Badges - 화살표 제거 및 가운데 정렬 */
+    /* Select Badges */
     .select-badge {
       font-weight: 700;
       text-align: center !important;
-      text-align-last: center !important; /* 드롭다운 내부 텍스트 정렬 */
+      text-align-last: center !important;
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
-      padding-right: 8px !important; /* 화살표 여백 제거 */
+      padding-right: 8px !important;
       cursor: pointer;
       width: 100%;
       max-width: 80px;
       margin: 0 auto;
       border: none;
     }
-    .select-badge::-ms-expand { display: none; } /* IE 화살표 숨김 */
+    .select-badge::-ms-expand { display: none; }
 
     /* 담당자 버튼 */
     .assign-btn {
@@ -190,7 +190,6 @@
 </head>
 <body>
 
-<!-- 담당자 관리 모달 -->
 <div class="modal fade" id="assigneeModal" tabindex="-1">
   <div class="modal-dialog modal-sm modal-dialog-centered">
     <div class="modal-content border-0 shadow">
@@ -221,19 +220,13 @@
       <h1 class="header-title">🚀 업무 관리 보드</h1>
     </div>
     <div class="d-flex flex-wrap gap-2 align-items-center">
-      
-      <!-- 분류 필터 -->
       <div class="input-group input-group-sm" style="width: auto;">
         <span class="input-group-text bg-white border text-muted" style="height: 34px;">📁</span>
         <select id="categoryFilter" class="form-select border shadow-sm" style="height: 34px; width: 140px;" onchange="filterTasks()">
           <option value="">전체 분류 보기</option>
         </select>
       </div>
-
-      <!-- 담당자 관리 -->
       <button class="btn-custom bg-white text-dark border shadow-sm" onclick="openAssigneeModal()">👥 담당자 관리</button>
-      
-      <!-- 기능 버튼 -->
       <input type="file" id="excelFile" class="d-none" accept=".xlsx, .xls" onchange="importExcel(event)">
       <button class="btn-custom bg-white text-dark border shadow-sm" onclick="document.getElementById('excelFile').click()">📥 엑셀 업로드</button>
       <button class="btn-custom bg-white text-dark border shadow-sm" onclick="loadData()">🔄 새로고침</button>
@@ -270,7 +263,6 @@
   const WEB_APP_URL = "여기에_구글_앱스크립트_웹_앱_URL을_넣으세요"; 
   // =========================================================
 
-  // 로컬 스토리지에 저장된 담당자 목록 불러오기 (없으면 기본값)
   let ASSIGNEES = JSON.parse(localStorage.getItem('myAssignees')) || ['홍길동', '김철수', '이영희', '박민수', '최지원'];
   
   const PRIORITIES = ['긴급', '높음', '보통', '낮음'];
@@ -278,7 +270,7 @@
 
   window.onload = function() {
     if (WEB_APP_URL.includes("여기에")) {
-      alert("⚠️ HTML 코드 172번째 줄에 구글 앱스크립트 웹 앱 URL을 입력해주세요!");
+      alert("⚠️ HTML 코드 200번째 줄에 구글 앱스크립트 웹 앱 URL을 입력해주세요!");
       document.getElementById('taskTableBody').innerHTML = '';
       addTaskRow();
     } else {
@@ -304,7 +296,7 @@
         if (data && data.length > 0) data.forEach(item => addTaskRow(item));
         else addTaskRow();
         
-        updateCategoryFilterOptions(); // 데이터 로드 후 필터 옵션 갱신
+        updateCategoryFilterOptions();
       })
       .catch(e => {
         alert("데이터 로드 실패\n" + e);
@@ -314,7 +306,6 @@
       .finally(() => showLoading(false));
   }
 
-  // 담당자 다중선택 체크박스 HTML 생성기 (목록에 없어도 기존 데이터 유지)
   function getAssigneeDropdownHTML(rowId, assignedStr) {
     const assignedArr = (assignedStr || '').split(',').map(s => s.trim()).filter(s => s !== '');
     const combinedList = [...new Set([...ASSIGNEES, ...assignedArr])];
@@ -322,7 +313,7 @@
     return combinedList.map(a => {
       const isChecked = assignedArr.includes(a) ? 'checked' : '';
       return `<li><label class="dropdown-item d-flex align-items-center gap-2" style="font-size:0.8rem; cursor:pointer;">
-                <input type="checkbox" class="form-check-input assign-chk m-0" value="\${a}" \${isChecked} onchange="updateAssigneeText('\${rowId}')"> \${a}
+                <input type="checkbox" class="form-check-input assign-chk m-0" value="${a}" ${isChecked} onchange="updateAssigneeText('${rowId}')"> ${a}
               </label></li>`;
     }).join('');
   }
@@ -342,57 +333,50 @@
     if (status === '완료') progressVal = 100;
     if (status === '착수전') progressVal = 0;
 
-    const priOptions = PRIORITIES.map(p => `<option value="\${p}" \${priority === p ? 'selected' : ''}>\${p}</option>`).join('');
-    const statOptions = STATUSES.map(s => `<option value="\${s}" \${status === s ? 'selected' : ''}>\${s}</option>`).join('');
+    const priOptions = PRIORITIES.map(p => `<option value="${p}" ${priority === p ? 'selected' : ''}>${p}</option>`).join('');
+    const statOptions = STATUSES.map(s => `<option value="${s}" ${status === s ? 'selected' : ''}>${s}</option>`).join('');
     
     const assignHTML = getAssigneeDropdownHTML(rowId, data.assignee);
 
     tr.innerHTML = `
-      <td><select class="form-select select-badge pri-select" onchange="updateColors('\${rowId}')">\${priOptions}</select></td>
-      <td><select class="form-select select-badge stat-select" onchange="updateStatus('\${rowId}')">\${statOptions}</select></td>
-      <td><input type="text" class="form-control fw-bold text-center text-primary category-input" style="background:#f1f5f9;" value="\${data.category || ''}" placeholder="분류명" onblur="updateCategoryFilterOptions()"></td>
-      <td><input type="text" class="form-control fw-bold" value="\${data.taskName || ''}" placeholder="업무명 입력"></td>
-      
-      <!-- 다중 선택 담당자 -->
+      <td><select class="form-select select-badge pri-select" onchange="updateColors('${rowId}')">${priOptions}</select></td>
+      <td><select class="form-select select-badge stat-select" onchange="updateStatus('${rowId}')">${statOptions}</select></td>
+      <td><input type="text" class="form-control fw-bold text-center text-primary category-input" style="background:#f1f5f9;" value="${data.category || ''}" placeholder="분류명" onblur="updateCategoryFilterOptions()"></td>
+      <td><input type="text" class="form-control fw-bold" value="${data.taskName || ''}" placeholder="업무명 입력"></td>
       <td>
         <div class="dropdown">
           <button class="form-select text-start text-truncate assign-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-            \${data.assignee || '선택'}
+            ${data.assignee || '선택'}
           </button>
           <ul class="dropdown-menu p-2 shadow-sm" style="max-height: 200px; overflow-y: auto;">
-            \${assignHTML}
+            ${assignHTML}
           </ul>
         </div>
-        <input type="hidden" class="task-assignee" value="\${data.assignee || ''}">
+        <input type="hidden" class="task-assignee" value="${data.assignee || ''}">
       </td>
-      
       <td>
-        <div class="progress-container \${isDoing ? '' : 'd-none'}">
-          <input type="range" class="form-range prog-range" min="0" max="100" value="\${progressVal}" style="width: 45px;" oninput="updateProgress('\${rowId}', this.value)">
-          <div class="progress-track"><div class="progress-fill" style="width: \${progressVal}%;"></div></div>
-          <div class="progress-text">\${progressVal}%</div>
+        <div class="progress-container ${isDoing ? '' : 'd-none'}">
+          <input type="range" class="form-range prog-range" min="0" max="100" value="${progressVal}" style="width: 45px;" oninput="updateProgress('${rowId}', this.value)">
+          <div class="progress-track"><div class="progress-fill" style="width: ${progressVal}%;"></div></div>
+          <div class="progress-text">${progressVal}%</div>
         </div>
-        <div class="text-muted small text-center prog-na \${isDoing ? 'd-none' : ''}">-</div>
+        <div class="text-muted small text-center prog-na ${isDoing ? 'd-none' : ''}">-</div>
       </td>
-      
-      <!-- 시작일~종료일 가로 배치 -->
       <td>
         <div class="d-flex align-items-center justify-content-center gap-1">
-          <input type="date" class="form-control text-muted" value="\${data.startDate || ''}" style="max-width: 105px; padding: 0 4px;" title="시작일">
+          <input type="date" class="form-control text-muted" value="${data.startDate || ''}" style="max-width: 105px; padding: 0 4px;" title="시작일">
           <span class="text-muted fw-bold" style="font-size: 0.8rem;">~</span>
-          <input type="date" class="form-control text-muted" value="\${data.endDate || ''}" style="max-width: 105px; padding: 0 4px;" title="종료일">
+          <input type="date" class="form-control text-muted" value="${data.endDate || ''}" style="max-width: 105px; padding: 0 4px;" title="종료일">
         </div>
       </td>
-      
       <td class="text-center">
-        <button class="btn btn-icon mx-auto" onclick="deleteRow('\${rowId}')" title="삭제">✕</button>
+        <button class="btn btn-icon mx-auto" onclick="deleteRow('${rowId}')" title="삭제">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
-    updateColors(rowId); // 렌더링 후 뱃지 색상 적용
+    updateColors(rowId);
   }
 
-  // 카테고리 필터 옵션 동기화
   function updateCategoryFilterOptions() {
     const categories = new Set();
     document.querySelectorAll('.category-input').forEach(input => {
@@ -412,7 +396,6 @@
     });
   }
 
-  // 필터링 실행
   function filterTasks() {
     const filterVal = document.getElementById('categoryFilter').value;
     document.querySelectorAll('#taskTableBody tr').forEach(row => {
@@ -426,7 +409,6 @@
     });
   }
 
-  // 담당자 텍스트 동기화
   function updateAssigneeText(rowId) {
     const row = document.getElementById(rowId);
     const checked = Array.from(row.querySelectorAll('.assign-chk:checked')).map(c => c.value);
@@ -436,13 +418,11 @@
     row.querySelector('.task-assignee').value = valStr;
   }
 
-  // 담당자 모달 열기
   function openAssigneeModal() {
     document.getElementById('assigneeInput').value = ASSIGNEES.join(', ');
     new bootstrap.Modal(document.getElementById('assigneeModal')).show();
   }
 
-  // 담당자 목록 저장 및 테이블 즉시 반영
   function saveAssignees() {
     const val = document.getElementById('assigneeInput').value;
     const newList = val.split(',').map(s => s.trim()).filter(s => s !== '');
@@ -451,7 +431,6 @@
     ASSIGNEES = newList;
     localStorage.setItem('myAssignees', JSON.stringify(ASSIGNEES));
     
-    // 기존 행들의 체크박스 목록 다시 그리기
     document.querySelectorAll('#taskTableBody tr').forEach(row => {
       const hiddenVal = row.querySelector('.task-assignee').value;
       const ul = row.querySelector('.dropdown-menu');
@@ -553,7 +532,7 @@
       const inputs = row.querySelectorAll('input, select');
       if (inputs.length < 5) return; 
       
-      const taskName = inputs[4].value.trim(); // 5번째 입력요소가 업무명
+      const taskName = inputs[4].value.trim();
       if (!taskName) return;
       
       const status = inputs[1].value;
@@ -562,7 +541,7 @@
         status: status,
         category: inputs[2].value.trim(),
         taskName: taskName,
-        assignee: row.querySelector('.task-assignee').value, // 다중 선택값 가져오기
+        assignee: row.querySelector('.task-assignee').value,
         progress: status === '진행중' ? Number(row.querySelector('.prog-range').value) : (status === '완료' ? 100 : 0),
         startDate: inputs[8].value,
         endDate: inputs[9].value

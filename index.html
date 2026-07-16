@@ -3,151 +3,273 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>업무 분장 및 관리 시스템</title>
+  <title>모던 업무 관리 대시보드</title>
+  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+  <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    body {
-      background-color: #f4f6f9;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 30px 15px;
+    :root {
+      --primary: #4f46e5;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      
+      /* Priority Colors */
+      --pri-urgent: #fee2e2; --pri-urgent-text: #ef4444;
+      --pri-high: #ffedd5; --pri-high-text: #f97316;
+      --pri-normal: #e0f2fe; --pri-normal-text: #0ea5e9;
+      --pri-low: #f1f5f9; --pri-low-text: #64748b;
+      
+      /* Status Colors */
+      --stat-todo: #f3f4f6; --stat-todo-text: #4b5563;
+      --stat-doing: #dbeafe; --stat-doing-text: #2563eb;
+      --stat-done: #dcfce7; --stat-done-text: #16a34a;
     }
-    .main-container {
-      max-width: 1400px;
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 40px 20px;
+    }
+
+    .dashboard-container {
+      max-width: 1600px;
       margin: 0 auto;
     }
-    .card {
-      border: none;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      background-color: #ffffff;
+
+    .header-section {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .card-header {
-      background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-      color: white;
-      border-radius: 15px 15px 0 0 !important;
+
+    .header-title {
+      font-weight: 800;
+      font-size: 1.8rem;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    /* Table & Card UI */
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
       padding: 20px;
+      overflow-x: auto;
     }
-    /* 상태별 행 색상 */
-    .status-todo {
-      background-color: #fffdf5 !important; /* 연한 노란색 */
-      transition: background-color 0.3s ease;
+
+    .custom-table {
+      width: 100%;
+      min-width: 1200px;
+      border-collapse: separate;
+      border-spacing: 0 12px; /* 행 사이 간격 */
     }
-    .status-doing {
-      background-color: #f0f7ff !important; /* 연한 파란색 */
-      transition: background-color 0.3s ease;
-    }
-    .status-done {
-      background-color: #f2faf6 !important; /* 연한 초록색 */
-      transition: background-color 0.3s ease;
-    }
-    .table th {
-      background-color: #f8f9fc;
-      color: #4e73df;
-      font-weight: 700;
-      text-transform: uppercase;
+
+    .custom-table th {
+      color: var(--text-muted);
+      font-weight: 600;
       font-size: 0.85rem;
-      border-bottom: 2px solid #e3e6f0;
-      text-align: center;
-      padding: 15px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 16px 8px 16px;
+      border: none;
     }
-    .table td {
-      padding: 12px 10px;
+
+    .custom-table tbody tr {
+      background-color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .custom-table tbody tr:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .custom-table td {
+      padding: 16px;
       vertical-align: middle;
-      border-bottom: 1px solid #e3e6f0;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
     }
-    .progress-bar-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    
+    .custom-table td:first-child {
+      border-left: 1px solid var(--border-color);
+      border-top-left-radius: 12px;
+      border-bottom-left-radius: 12px;
     }
-    .progress {
-      flex-grow: 1;
-      height: 12px;
-      border-radius: 6px;
-      background-color: #eaecf4;
+    
+    .custom-table td:last-child {
+      border-right: 1px solid var(--border-color);
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
-    /* 로딩 화면 스타일 */
+
+    /* Form Controls */
+    .form-control, .form-select {
+      border: 1px solid transparent;
+      background-color: #f8fafc;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      padding: 8px 12px;
+      color: var(--text-main);
+    }
+
+    .form-control:hover, .form-select:hover {
+      background-color: #f1f5f9;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background-color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    /* Select Badges */
+    .select-badge {
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn-custom {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 10px 20px;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary-custom {
+      background-color: var(--primary);
+      color: white;
+    }
+    .btn-primary-custom:hover {
+      background-color: #4338ca;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+    .btn-add {
+      background-color: #10b981;
+      color: white;
+    }
+    .btn-add:hover {
+      background-color: #059669;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-icon {
+      width: 32px; height: 32px;
+      padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      color: #ef4444; background: #fee2e2;
+    }
+    .btn-icon:hover {
+      background: #f87171; color: white;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .form-range {
+      height: 6px;
+    }
+    .form-range::-webkit-slider-thumb {
+      background: var(--primary);
+    }
+    .progress-track {
+      flex-grow: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--primary); transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 0.8rem; font-weight: 700; min-width: 36px; text-align: right; color: var(--primary);
+    }
+
     #loadingOverlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;
     }
-    .d-none { display: none !important; }
   </style>
 </head>
 <body>
 
 <div id="loadingOverlay" class="d-none">
-  <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-  <h5 class="mt-3 text-primary fw-bold" id="loadingText">데이터 처리 중...</h5>
+  <div class="spinner-border" style="color: var(--primary); width: 3rem; height: 3rem;" role="status"></div>
+  <h5 class="mt-3 fw-bold" style="color: var(--primary);" id="loadingText">데이터 동기화 중...</h5>
 </div>
 
-<div class="main-container">
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-      <h3 class="m-0 fw-bold">📋 실시간 업무 분장 및 현황 관리 시스템</h3>
-      <span class="badge bg-light text-primary py-2 px-3 fw-bold">GitHub Pages - Sheets 연동</span>
+<div class="dashboard-container">
+  
+  <div class="header-section">
+    <div>
+      <h1 class="header-title">🚀 업무 관리 보드</h1>
+      <p class="text-muted mt-1 mb-0" style="font-size: 0.95rem;">팀의 모든 업무를 한눈에 파악하고 효율적으로 관리하세요.</p>
     </div>
-    <div class="card-body p-4">
-      
-      <div class="row g-3 mb-4 align-items-end">
-        <div class="col-lg-5 col-md-6">
-          <label class="form-label fw-bold text-secondary">📥 엑셀 파일 가져오기 (업무명 일괄 등록)</label>
-          <div class="input-group">
-            <input type="file" id="excelFile" class="form-control" accept=".xlsx, .xls" onchange="importExcel(event)">
-            <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('excelFile').value=''">초기화</button>
-          </div>
-        </div>
-        <div class="col-lg-7 col-md-6 text-md-end text-start">
-          <button class="btn btn-outline-primary fw-bold me-2" onclick="loadData()">🔄 새로고침</button>
-          <button class="btn btn-success fw-bold me-2" onclick="addTaskRow()">➕ 업무 추가</button>
-          <button id="saveBtn" class="btn btn-primary fw-bold" onclick="saveAll()">💾 구글 시트에 저장</button>
-        </div>
+    <div class="d-flex gap-2">
+      <div>
+        <input type="file" id="excelFile" class="d-none" accept=".xlsx, .xls" onchange="importExcel(event)">
+        <button class="btn-custom bg-white text-dark border shadow-sm" onclick="document.getElementById('excelFile').click()">
+          📥 엑셀 업로드
+        </button>
       </div>
-
-      <div class="table-responsive">
-        <table class="table table-bordered align-middle">
-          <thead>
-            <tr>
-              <th style="width: 25%;">업무명</th>
-              <th style="width: 15%;">담당자</th>
-              <th style="width: 15%;">진행상태</th>
-              <th style="width: 20%;">진행도</th>
-              <th style="width: 10%;">시작일</th>
-              <th style="width: 10%;">종료일</th>
-              <th style="width: 5%;">삭제</th>
-            </tr>
-          </thead>
-          <tbody id="taskTableBody">
-            <tr>
-              <td colspan="7" class="text-center py-5 text-muted">데이터를 불러오는 중입니다...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
+      <button class="btn-custom bg-white text-dark border shadow-sm" onclick="loadData()">🔄 새로고침</button>
+      <button class="btn-custom btn-add" onclick="addTaskRow()">➕ 업무 추가</button>
+      <button id="saveBtn" class="btn-custom btn-primary-custom" onclick="saveAll()">💾 시트에 저장</button>
     </div>
   </div>
+
+  <div class="table-container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th style="width: 10%;">우선순위</th>
+          <th style="width: 12%;">진행상태</th>
+          <th style="width: 12%;">대분류</th>
+          <th style="width: 20%;">업무명</th>
+          <th style="width: 10%;">담당자</th>
+          <th style="width: 18%;">진행도</th>
+          <th style="width: 12%;">기간 (시작-종료)</th>
+          <th style="width: 5%; text-align:center;">관리</th>
+        </tr>
+      </thead>
+      <tbody id="taskTableBody">
+        <tr><td colspan="8" class="text-center py-5 text-muted">데이터를 불러오는 중입니다...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
 <script>
   // =========================================================
-  // ★★★ 구글 앱스크립트 웹 앱 URL을 아래 큰따옴표 안에 꼭 넣어주세요! ★★★
-  // =========================================================
+  // ★★★ 구글 앱스크립트 웹 앱 URL 입력 ★★★
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHcU3bvNYf75LGpsFKM_pAIVEZPy42qs19d-rsCKlbz77WwGOxYmKLCjIhONUs2VTL/exec"; 
+  // =========================================================
 
-  const ASSIGNEES = ['선택 안함', '홍길동', '김철수', '이영희', '박민수', '최지원'];
+  const ASSIGNEES = ['선택 안함', '허지예', '박수민', '박승연', '팀장님'];
+  const PRIORITIES = ['긴급', '높음', '보통', '낮음'];
+  const STATUSES = ['착수전', '진행중', '완료'];
 
-  // 0. 화면 로드 시 시작
   window.onload = function() {
-    if (WEB_APP_URL === "여기에_구글_앱스크립트_웹_앱_URL을_넣으세요") {
-      alert("⚠️ [안내] HTML 코드 110번째 줄에 구글 앱스크립트 배포 URL을 입력해야 연동됩니다!");
+    if (WEB_APP_URL.includes("여기에")) {
+      alert("⚠️ HTML 코드 내에 구글 앱스크립트 웹 앱 URL을 입력해주세요!");
       document.getElementById('taskTableBody').innerHTML = '';
       addTaskRow();
     } else {
@@ -155,37 +277,32 @@
     }
   };
 
-  function showLoading(show, text = "데이터 처리 중...") {
+  function showLoading(show, text = "데이터 동기화 중...") {
     const overlay = document.getElementById('loadingOverlay');
     document.getElementById('loadingText').innerText = text;
     show ? overlay.classList.remove('d-none') : overlay.classList.add('d-none');
   }
 
-  // 1. 구글 시트에서 데이터 읽어오기 (GET)
   function loadData() {
     if (WEB_APP_URL.includes("여기에")) return;
-    showLoading(true, "구글 시트에서 데이터를 동기화하는 중...");
+    showLoading(true, "구글 시트에서 데이터를 불러오는 중...");
     
     fetch(WEB_APP_URL)
-      .then(response => response.json())
+      .then(r => r.json())
       .then(data => {
         const tbody = document.getElementById('taskTableBody');
         tbody.innerHTML = '';
-        if (data && data.length > 0) {
-          data.forEach(item => addTaskRow(item));
-        } else {
-          addTaskRow();
-        }
+        if (data && data.length > 0) data.forEach(item => addTaskRow(item));
+        else addTaskRow();
       })
-      .catch(err => {
-        alert("데이터 연동 실패: 배포 URL이 정확한지 확인하세요.\n" + err);
+      .catch(e => {
+        alert("데이터 로드 실패\n" + e);
         document.getElementById('taskTableBody').innerHTML = '';
         addTaskRow();
       })
       .finally(() => showLoading(false));
   }
 
-  // 2. 화면에 행 추가하기
   function addTaskRow(data = {}) {
     const tbody = document.getElementById('taskTableBody');
     if (tbody.rows.length === 1 && tbody.rows[0].cells.length === 1) tbody.innerHTML = '';
@@ -194,72 +311,103 @@
     const tr = document.createElement('tr');
     tr.id = rowId;
     
+    const priority = data.priority || '보통';
     const status = data.status || '착수전';
-    tr.className = getStatusClass(status);
-
     const isDoing = status === '진행중';
     let progressVal = data.progress !== undefined ? data.progress : 0;
     if (status === '완료') progressVal = 100;
     if (status === '착수전') progressVal = 0;
 
-    let assigneeOptions = ASSIGNEES.map(n => `<option value="${n}" ${data.assignee === n ? 'selected' : ''}>${n}</option>`).join('');
-    let statusOptions = ['착수전', '진행중', '완료'].map(s => `<option value="${s}" ${status === s ? 'selected' : ''}>${s}</option>`).join('');
+    const priOptions = PRIORITIES.map(p => `<option value="${p}" ${priority === p ? 'selected' : ''}>${p}</option>`).join('');
+    const statOptions = STATUSES.map(s => `<option value="${s}" ${status === s ? 'selected' : ''}>${s}</option>`).join('');
+    const assignOptions = ASSIGNEES.map(a => `<option value="${a}" ${data.assignee === a ? 'selected' : ''}>${a}</option>`).join('');
 
     tr.innerHTML = `
-      <td><input type="text" class="form-control form-control-sm task-name" value="${data.taskName || ''}" placeholder="업무명 입력"></td>
-      <td><select class="form-select form-select-sm task-assignee">${assigneeOptions}</select></td>
-      <td><select class="form-select form-select-sm task-status" onchange="updateRowStatus('${rowId}')">${statusOptions}</select></td>
+      <!-- 1. 우선순위 -->
+      <td><select class="form-select select-badge pri-select" onchange="updateColors('${rowId}')">${priOptions}</select></td>
+      <!-- 2. 진행상태 -->
+      <td><select class="form-select select-badge stat-select" onchange="updateStatus('${rowId}')">${statOptions}</select></td>
+      <!-- 3. 대분류 -->
+      <td><input type="text" class="form-control fw-bold text-center text-primary" style="background:#f1f5f9;" value="${data.category || ''}" placeholder="분류 입력"></td>
+      <!-- 4. 업무명 -->
+      <td><input type="text" class="form-control fw-bold" value="${data.taskName || ''}" placeholder="업무명 입력"></td>
+      <!-- 5. 담당자 -->
+      <td><select class="form-select">${assignOptions}</select></td>
+      <!-- 6. 진행도 -->
       <td>
-        <div class="progress-wrapper ${isDoing ? '' : 'd-none'}">
-          <div class="progress-bar-container">
-            <input type="range" class="form-range task-progress-range" min="0" max="100" value="${progressVal}" style="width: 45%;" oninput="updateProgress('${rowId}', this.value)">
-            <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width: ${progressVal}%;">${progressVal}%</div></div>
-          </div>
+        <div class="progress-container ${isDoing ? '' : 'd-none'}">
+          <input type="range" class="form-range prog-range" min="0" max="100" value="${progressVal}" style="width: 60px;" oninput="updateProgress('${rowId}', this.value)">
+          <div class="progress-track"><div class="progress-fill" style="width: ${progressVal}%;"></div></div>
+          <div class="progress-text">${progressVal}%</div>
         </div>
-        <span class="text-muted small progress-na ${isDoing ? 'd-none' : ''}">진행중일 때 활성화</span>
+        <div class="text-muted small text-center prog-na ${isDoing ? 'd-none' : ''}">-</div>
       </td>
-      <td><input type="date" class="form-control form-control-sm task-start-date" value="${data.startDate || ''}"></td>
-      <td><input type="date" class="form-control form-control-sm task-end-date" value="${data.endDate || ''}"></td>
-      <td class="text-center"><button class="btn btn-danger btn-sm rounded-circle" onclick="deleteRow('${rowId}')">✕</button></td>
+      <!-- 7 & 8. 기간 -->
+      <td>
+        <div class="d-flex flex-column gap-1">
+          <input type="date" class="form-control form-control-sm text-muted" value="${data.startDate || ''}" title="시작일">
+          <input type="date" class="form-control form-control-sm text-muted" value="${data.endDate || ''}" title="종료일">
+        </div>
+      </td>
+      <!-- 9. 관리 -->
+      <td class="text-center">
+        <button class="btn btn-icon mx-auto" onclick="deleteRow('${rowId}')" title="삭제">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        </button>
+      </td>
     `;
     tbody.appendChild(tr);
+    updateColors(rowId); // 초기 색상 반영
   }
 
-  // 3. 상태 변경 시 동작
-  function updateRowStatus(rowId) {
+  function updateColors(rowId) {
     const row = document.getElementById(rowId);
-    const status = row.querySelector('.task-status').value;
-    row.className = getStatusClass(status);
+    if (!row) return;
+    
+    // 우선순위 색상
+    const priSelect = row.querySelector('.pri-select');
+    const pri = priSelect.value;
+    if(pri==='긴급'){ priSelect.style.backgroundColor='var(--pri-urgent)'; priSelect.style.color='var(--pri-urgent-text)'; }
+    else if(pri==='높음'){ priSelect.style.backgroundColor='var(--pri-high)'; priSelect.style.color='var(--pri-high-text)'; }
+    else if(pri==='보통'){ priSelect.style.backgroundColor='var(--pri-normal)'; priSelect.style.color='var(--pri-normal-text)'; }
+    else { priSelect.style.backgroundColor='var(--pri-low)'; priSelect.style.color='var(--pri-low-text)'; }
 
-    const pWrap = row.querySelector('.progress-wrapper'), pNa = row.querySelector('.progress-na');
-    const range = row.querySelector('.task-progress-range');
+    // 진행상태 색상
+    const statSelect = row.querySelector('.stat-select');
+    const stat = statSelect.value;
+    if(stat==='착수전'){ statSelect.style.backgroundColor='var(--stat-todo)'; statSelect.style.color='var(--stat-todo-text)'; }
+    else if(stat==='진행중'){ statSelect.style.backgroundColor='var(--stat-doing)'; statSelect.style.color='var(--stat-doing-text)'; }
+    else { statSelect.style.backgroundColor='var(--stat-done)'; statSelect.style.color='var(--stat-done-text)'; }
+  }
 
-    if (status === '진행중') {
-      pWrap.classList.remove('d-none'); pNa.classList.add('d-none');
-      range.value = 10; updateProgress(rowId, 10);
+  function updateStatus(rowId) {
+    updateColors(rowId);
+    const row = document.getElementById(rowId);
+    const stat = row.querySelector('.stat-select').value;
+    
+    const pCont = row.querySelector('.progress-container'), pNa = row.querySelector('.prog-na');
+    const range = row.querySelector('.prog-range');
+
+    if (stat === '진행중') {
+      pCont.classList.remove('d-none'); pNa.classList.add('d-none');
+      if(range.value == 0 || range.value == 100) { range.value = 10; updateProgress(rowId, 10); }
     } else {
-      pWrap.classList.add('d-none'); pNa.classList.remove('d-none');
-      if (status === '완료') { range.value = 100; updateProgress(rowId, 100); }
+      pCont.classList.add('d-none'); pNa.classList.remove('d-none');
+      if (stat === '완료') { range.value = 100; updateProgress(rowId, 100); }
       else { range.value = 0; updateProgress(rowId, 0); }
     }
   }
 
   function updateProgress(rowId, value) {
-    const bar = document.getElementById(rowId).querySelector('.progress-bar');
-    bar.style.width = value + '%'; bar.textContent = value + '%';
-  }
-
-  function getStatusClass(status) {
-    if (status === '착수전') return 'status-todo';
-    if (status === '진행중') return 'status-doing';
-    if (status === '완료') return 'status-done';
+    const row = document.getElementById(rowId);
+    row.querySelector('.progress-fill').style.width = value + '%';
+    row.querySelector('.progress-text').textContent = value + '%';
   }
 
   function deleteRow(rowId) {
-    if(confirm("이 항목을 삭제할까요? (구글 시트에 저장해야 반영됨)")) document.getElementById(rowId).remove();
+    if(confirm("행을 삭제하시겠습니까?")) document.getElementById(rowId).remove();
   }
 
-  // 4. 엑셀 업로드 파싱
   function importExcel(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -274,15 +422,21 @@
         if (jsonData.length <= 1) return alert("데이터가 없습니다.");
         
         const tbody = document.getElementById('taskTableBody');
-        if (tbody.rows.length === 1 && !tbody.rows[0].querySelector('.task-name')?.value) tbody.innerHTML = '';
+        if (tbody.rows.length === 1 && !tbody.rows[0].querySelector('input[placeholder="업무명 입력"]')?.value) tbody.innerHTML = '';
 
+        // 엑셀 열 순서: 우선순위(0), 상태(1), 분류(2), 업무명(3), 담당자(4), 진행도(5), 시작일(6), 종료일(7)
         jsonData.slice(1).forEach(row => {
-          if (row[0]) addTaskRow({
-            taskName: row[0], assignee: row[1] || '선택 안함', status: row[2] || '착수전',
-            progress: row[3] || 0, startDate: parseExcelDate(row[4]), endDate: parseExcelDate(row[5])
+          if (row[3]) addTaskRow({ // 업무명(D열)이 존재하면
+            priority: row[0] || '보통',
+            status: row[1] || '착수전',
+            category: row[2] || '',
+            taskName: row[3],
+            assignee: row[4] || '선택 안함',
+            progress: row[5] || 0,
+            startDate: parseExcelDate(row[6]),
+            endDate: parseExcelDate(row[7])
           });
         });
-        alert("엑셀 데이터 파싱 완료! 구글 시트에 저장 버튼을 눌러주세요.");
       } catch (err) { alert("엑셀 분석 에러"); }
       finally { showLoading(false); document.getElementById('excelFile').value = ''; }
     };
@@ -295,35 +449,39 @@
     const d = new Date(val); return isNaN(d.getTime()) ? "" : d.toISOString().split('T')[0];
   }
 
-  // 5. 구글 시트로 저장 (POST)
   function saveAll() {
-    if (WEB_APP_URL.includes("여기에")) return alert("웹 앱 URL을 넣어야 저장할 수 있습니다!");
+    if (WEB_APP_URL.includes("여기에")) return alert("URL을 입력해주세요!");
 
     const data = [];
     document.querySelectorAll('#taskTableBody tr').forEach(row => {
-      const nameInput = row.querySelector('.task-name');
-      if (!nameInput || !nameInput.value.trim()) return;
+      const inputs = row.querySelectorAll('input, select');
+      if (inputs.length < 5) return;
       
-      const status = row.querySelector('.task-status').value;
+      const taskName = inputs[3].value.trim(); // 4번째 input/select가 업무명
+      if (!taskName) return;
+      
+      const status = inputs[1].value;
       data.push({
-        taskName: nameInput.value.trim(),
-        assignee: row.querySelector('.task-assignee').value,
+        priority: inputs[0].value,
         status: status,
-        progress: status === '진행중' ? Number(row.querySelector('.task-progress-range').value) : (status === '완료' ? 100 : 0),
-        startDate: row.querySelector('.task-start-date').value,
-        endDate: row.querySelector('.task-end-date').value
+        category: inputs[2].value.trim(),
+        taskName: taskName,
+        assignee: inputs[4].value,
+        progress: status === '진행중' ? Number(row.querySelector('.prog-range').value) : (status === '완료' ? 100 : 0),
+        startDate: inputs[6].value,
+        endDate: inputs[7].value
       });
     });
 
-    if (data.length === 0) return alert("저장할 업무 내용이 없습니다.");
+    if (data.length === 0) return alert("저장할 업무가 없습니다.");
 
-    showLoading(true, "구글 시트에 데이터를 저장하는 중...");
+    showLoading(true, "구글 시트에 저장 중...");
     document.getElementById('saveBtn').disabled = true;
 
     fetch(WEB_APP_URL, {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' } // CORS 회피용
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
     })
     .then(res => res.text())
     .then(result => { alert(result); loadData(); })

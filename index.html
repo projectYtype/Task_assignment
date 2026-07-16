@@ -32,7 +32,8 @@
       --stat-doing: #dbeafe; --stat-doing-text: #2563eb;
       --stat-done: #dcfce7; --stat-done-text: #16a34a;
     }
-
+<!-- SortableJS (드래그 앤 드롭) -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     body {
       font-family: 'Pretendard', -apple-system, sans-serif;
       background-color: var(--bg-color);
@@ -284,6 +285,14 @@
     } else {
       loadData();
     }
+
+    // 💡 아래 5줄이 새롭게 추가되는 부분입니다!
+    const tbody = document.getElementById('taskTableBody');
+    new Sortable(tbody, {
+      animation: 150,               // 드래그 시 부드럽게 이동하는 애니메이션 (150ms)
+      handle: '.drag-handle',       // ☰ 버튼(drag-handle 클래스)을 잡았을 때만 이동
+      ghostClass: 'bg-light'        // 드래그 중인 행의 배경색을 살짝 어둡게 표시
+    });
   };
 
   function showLoading(show, text = "데이터 동기화 중...") {
@@ -378,7 +387,11 @@
         </div>
       </td>
       <td class="text-center">
-        <button class="btn btn-icon mx-auto" onclick="deleteRow('${rowId}')" title="삭제">✕</button>
+        <div class="d-flex justify-content-center gap-1">
+          <!-- 드래그 손잡이 버튼 추가 -->
+          <button type="button" class="drag-handle" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: none; color: #475569; background: #e2e8f0; cursor: grab;" title="순서 변경">☰</button>
+          <button type="button" class="btn btn-icon" onclick="deleteRow('${rowId}')" title="삭제">✕</button>
+        </div>
       </td>
     `;
     tbody.appendChild(tr);

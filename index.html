@@ -97,14 +97,12 @@
     .custom-table tbody tr {
       background-color: #ffffff;
       box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-      transition: all 0.15s;
     }
 
-    .custom-table tbody tr:hover {
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      transform: translateY(-1px);
+    /* 테이블 행에 마우스를 올렸을 때 애니메이션 대신 배경색이 살짝 변하게 처리 (충돌 방지) */
+    .custom-table tbody tr:hover td {
+      background-color: #f8fafc;
     }
-
     .custom-table td {
       padding: 6px 10px;
       vertical-align: middle;
@@ -352,7 +350,7 @@
       <td><select class="form-select select-badge pri-select" onchange="updateColors('${rowId}')">${priOptions}</select></td>
       <td><select class="form-select select-badge stat-select" onchange="updateStatus('${rowId}')">${statOptions}</select></td>
       <td><input type="text" class="form-control fw-bold text-center text-primary category-input" style="background:#f1f5f9;" value="${data.category || ''}" placeholder="분류명" onblur="updateCategoryFilterOptions()"></td>
-      <td><input type="text" class="form-control fw-bold" value="${data.taskName || ''}" placeholder="업무명 입력"></td>
+     <td><input type="text" class="form-control fw-bold task-name-input" value="${data.taskName || ''}" placeholder="업무명 입력"></td>
       <td>
         <div class="dropdown">
           <button class="form-select text-start text-truncate assign-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
@@ -535,44 +533,46 @@
   }
 
   function saveAll() {
-    if (WEB_APP_URL.includes("여기에")) return alert("URL을 입력해주세요!");
+  if (WEB_APP_URL.includes("여기에")) return alert("URL을 입력해주세요!");
 
-    const data = [];
-    document.querySelectorAll('#taskTableBody tr').forEach(row => {
-      const inputs = row.querySelectorAll('input, select');
-      if (inputs.length < 5) return; 
-      
-      const taskName = inputs[4].value.trim();
-      if (!taskName) return;
-      
-      const status = inputs[1].value;
-      data.push({
-        priority: inputs[0].value,
-        status: status,
-        category: inputs[2].value.trim(),
-        taskName: taskName,
-        assignee: row.querySelector('.task-assignee').value,
-        progress: status === '진행중' ? Number(row.querySelector('.prog-range').value) : (status === '완료' ? 100 : 0),
-        startDate: inputs[8].value,
-        endDate: inputs[9].value
-      });
+  const data = [];
+  document.querySelectorAll('#taskTableBody tr').forEach(row => {
+    // 1. 업무명 인풋박스를 클래스로 정확히 찾기
+    const taskNameInput = row.querySelector('.task-name-input');
+    if (!taskNameInput) return; 
+    
+    const taskName = taskNameInput.value.trim();
+    if (!taskName) return; // 업무명이 비어있으면 저장 건너뜀
+    
+    const status = row.querySelector('.stat-select').value;
+    
+    data.push({
+      priority: row.querySelector('.pri-select').value,
+      status: status,
+      category: row.querySelector('.category-input').value.trim(),
+      taskName: taskName, // 정확히 찾은 업무명 데이터 삽입
+      assignee: row.querySelector('.task-assignee').value,
+      progress: status === '진행중' ? Number(row.querySelector('.prog-range').value) : (status === '완료' ? 100 : 0),
+      startDate: row.querySelector('input[title="시작일"]').value,
+      endDate: row.querySelector('input[title="종료일"]').value
     });
+  });
 
-    if (data.length === 0) return alert("저장할 업무가 없습니다.");
+  if (data.length === 0) return alert("저장할 업무가 없습니다.");
 
-    showLoading(true, "구글 시트에 저장 중...");
-    document.getElementById('saveBtn').disabled = true;
+  showLoading(true, "구글 시트에 저장 중...");
+  document.getElementById('saveBtn').disabled = true;
 
-    fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-    })
-    .then(res => res.text())
-    .then(result => { alert(result); loadData(); })
-    .catch(err => alert("저장 실패: " + err.message))
-    .finally(() => { showLoading(false); document.getElementById('saveBtn').disabled = false; });
-  }
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+  })
+  .then(res => res.text())
+  .then(result => { alert(result); loadData(); })
+  .catch(err => alert("저장 실패: " + err.message))
+  .finally(() => { showLoading(false); document.getElementById('saveBtn').disabled = false; });
+}
 </script>
 
 </body>

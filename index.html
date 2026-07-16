@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>업무 관리 대시보드</title>
+  <title>모던 업무 관리 대시보드</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap 5 JS Bundle (Dropdown & Modal) -->
+  <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Pretendard Font -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
@@ -70,7 +70,11 @@
       border-radius: 12px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       padding: 12px;
+      /* 짤림 방지: 하단 여백 넉넉하게 추가 및 스크롤 옵션 조정 */
+      padding-bottom: 180px; 
+      min-height: 400px;
       overflow-x: auto;
+      overflow-y: visible;
     }
 
     .custom-table {
@@ -147,6 +151,13 @@
       display: flex;
       align-items: center;
       cursor: pointer;
+    }
+    
+    /* 드롭다운 메뉴 (z-index 및 높이 조절) */
+    .dropdown-menu {
+      z-index: 1050;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border: 1px solid var(--border-color);
     }
 
     /* Buttons */
@@ -260,7 +271,7 @@
 <script>
   // =========================================================
   // ★★★ 구글 앱스크립트 웹 앱 URL 입력 ★★★
-  const WEB_APP_URL = "여기에_구글_앱스크립트_웹_앱_URL을_넣으세요"; 
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHcU3bvNYf75LGpsFKM_pAIVEZPy42qs19d-rsCKlbz77WwGOxYmKLCjIhONUs2VTL/exec"; 
   // =========================================================
 
   let ASSIGNEES = JSON.parse(localStorage.getItem('myAssignees')) || ['홍길동', '김철수', '이영희', '박민수', '최지원'];
@@ -270,7 +281,6 @@
 
   window.onload = function() {
     if (WEB_APP_URL.includes("여기에")) {
-      alert("");
       document.getElementById('taskTableBody').innerHTML = '';
       addTaskRow();
     } else {
@@ -348,7 +358,7 @@
           <button class="form-select text-start text-truncate assign-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
             ${data.assignee || '선택'}
           </button>
-          <ul class="dropdown-menu p-2 shadow-sm" style="max-height: 200px; overflow-y: auto;">
+          <ul class="dropdown-menu p-2 shadow-sm" style="max-height: 250px; overflow-y: auto;">
             ${assignHTML}
           </ul>
         </div>
